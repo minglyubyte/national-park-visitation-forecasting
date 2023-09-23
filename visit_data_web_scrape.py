@@ -6,14 +6,24 @@ from selenium.webdriver.support.ui import Select
 import time
 import pandas as pd
 import numpy as np
-import requests # Used to make HTTP requests to the API
-import json # Used to process JSON strings
+import requests
+import json
 import urllib.request, json
 import os
 import glob
 
 # Function to interact with dropdown
 def interact_with_dropdown(driver, container_id, value_to_select, wait):
+    """
+    Interacts with a dropdown menu on a webpage.
+
+    Args:
+        driver (webdriver): The Selenium WebDriver instance.
+        container_id (str): The ID of the dropdown container element.
+        value_to_select (str): The value to select in the dropdown.
+        wait (WebDriverWait): The WebDriverWait instance for explicit waits.
+    """
+    
     # Locate the dropdown container by its ID
     dropdown_container = driver.find_element(By.ID, container_id)
 
@@ -31,6 +41,13 @@ def interact_with_dropdown(driver, container_id, value_to_select, wait):
     dropdown_select.select_by_value(value_to_select)
 
 def rename_file(current_file_name, new_file_name):
+    """
+    Renames a file using the os.rename() function.
+
+    Args:
+        current_file_name (str): The current name of the file.
+        new_file_name (str): The new name for the file.
+    """
     # Use the os.rename() function to rename the file
     try:
         os.rename(current_file_name, new_file_name)
@@ -43,6 +60,12 @@ def rename_file(current_file_name, new_file_name):
         print(f"An error occurred: {str(e)}")
 
 def extract_single_park_visit_data(park_code):
+    """
+    Extracts data for a single park visit from a website and saves it as a CSV file.
+
+    Args:
+        park_code (str): The park code for the specific park.
+    """
     # Initialize a web driver (you can use other drivers like Firefox or Edge)
     driver = webdriver.Chrome()
 
@@ -62,8 +85,8 @@ def extract_single_park_visit_data(park_code):
 
     time.sleep(2) 
 
-    for i in range(1,120):
-        check_file_exist_path = "/Users/leo/Downloads/{}_{}_monthly_visit.csv".format(park_code,i)
+    for i in range(1, 120):
+        check_file_exist_path = f"/Users/leo/Downloads/{park_code}_{i}_monthly_visit.csv"
         if os.path.exists(check_file_exist_path):
             continue
         # Interact with the second dropdown
@@ -87,24 +110,25 @@ def extract_single_park_visit_data(park_code):
         wait.until(EC.visibility_of_element_located((By.ID, 'ReportViewer_ctl05_ctl04_ctl00_Button')))
 
         time.sleep(3)
-        # Export as csv
+        # Export as CSV
         csv_option = driver.find_element(By.XPATH, "//a[contains(text(), 'CSV (comma delimited)')]")
         time.sleep(3)
         csv_option.click()
         
         time.sleep(5)
         try:
+            # Rename the file by park-code and date id
             matching_files = glob.glob(f"/Users/leo/Downloads/Monthly Public*")
             old_file_name = matching_files[0]
-            new_file_name = "/Users/leo/Downloads/{}_{}_monthly_visit.csv".format(park_code,i)
+            new_file_name = f"/Users/leo/Downloads/{park_code}_{i}_monthly_visit.csv"
             rename_file(old_file_name, new_file_name)
         except:
             continue
 
-        # Close the web driver when you're done
         time.sleep(5) 
+        
+    # Close the web driver when you're done
     driver.quit()
-
 
 if __name__ == "__main__":
     park_to_option_value = json.load(open("data/NPS_park_to_option_value.json","r"))
@@ -114,12 +138,3 @@ if __name__ == "__main__":
         print(key.strip())
         park_code = park_to_option_value[key.strip()]
         extract_single_park_visit_data(park_code)
-    
-
-
-
-
-
-
-
-
