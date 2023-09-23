@@ -107,8 +107,8 @@ def extract_single_park_visit_data(park_code):
 
 
 if __name__ == "__main__":
-    park_to_option_value = json.load(open("NPS_park_to_option_value.json","r"))
-    park_info = json.load(open("national_park_code.json","r"))
+    park_to_option_value = json.load(open("data/NPS_park_to_option_value.json","r"))
+    park_info = json.load(open("data/national_park_code.json","r"))
 
     for key in park_info:
         print(key.strip())
